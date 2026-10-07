@@ -1,0 +1,166 @@
+.tiles {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.card {
+  min-width: 0;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 132px;
+}
+
+.tile-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.hero-value {
+  margin-top: auto;
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.tile-value {
+  margin-top: auto;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.tile-note {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+}
+
+.delta svg {
+  width: 10px;
+  height: 10px;
+  fill: #0ca30c;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.link {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.link:hover {
+  color: var(--ink);
+}
+
+.top {
+  list-style: none;
+  display: grid;
+}
+
+.top li {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.top li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.rank {
+  color: var(--faint);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.top-title strong,
+.top-title small {
+  display: block;
+  line-height: 1.35;
+}
+
+.top-title strong {
+  font-weight: 500;
+}
+
+.top-title small {
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.top-views {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.skeleton {
+  display: block;
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-2), var(--line), var(--surface-2));
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+  list-style: none;
+}
+
+.skeleton-hero {
+  height: 48px;
+  margin-top: auto;
+  width: 70%;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 1100px) {
+  .tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .span-2 {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-value {
+    font-size: 40px;
+  }
+}

@@ -1,0 +1,99 @@
+<header class="page-head">
+  <div>
+    <h1>Overview</h1>
+    <p>How the Lumen catalog is performing.</p>
+  </div>
+  <a class="btn" routerLink="/titles">Manage titles</a>
+</header>
+
+<section class="tiles" aria-label="Key numbers">
+  <div class="card tile tile-hero">
+    <span class="tile-label">Total views</span>
+    @if (tiles(); as t) {
+      <strong class="hero-value">{{ formatNumber(t.views) }}</strong>
+      <span class="tile-note">across {{ t.titles }} titles</span>
+    } @else {
+      <span class="skeleton skeleton-hero"></span>
+    }
+  </div>
+  <div class="card tile">
+    <span class="tile-label">Views, last 30 days</span>
+    <strong class="tile-value">{{ formatCompact(monthViews) }}</strong>
+    <span class="tile-note delta">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2l4 5H2z" /></svg>
+      {{ change }}% vs previous 15 days
+    </span>
+  </div>
+  <div class="card tile">
+    <span class="tile-label">Published</span>
+    @if (tiles(); as t) {
+      <strong class="tile-value">{{ t.published }}</strong>
+      <span class="tile-note">live in the app</span>
+    } @else {
+      <span class="skeleton"></span>
+    }
+  </div>
+  <div class="card tile">
+    <span class="tile-label">Drafts</span>
+    @if (tiles(); as t) {
+      <strong class="tile-value">{{ t.drafts }}</strong>
+      <span class="tile-note">waiting for review</span>
+    } @else {
+      <span class="skeleton"></span>
+    }
+  </div>
+</section>
+
+<section class="grid">
+  <article class="card span-2">
+    <div class="card-head">
+      <h2>Daily views</h2>
+      <span>Last 30 days · sample data</span>
+    </div>
+    <app-line-chart [data]="daily" />
+  </article>
+
+  <article class="card">
+    <div class="card-head">
+      <h2>Titles by status</h2>
+    </div>
+    @if (stats(); as s) {
+      <app-status-bar [data]="s.byStatus" />
+    } @else {
+      <span class="skeleton"></span>
+    }
+  </article>
+
+  <article class="card span-2">
+    <div class="card-head">
+      <h2>Views by genre</h2>
+      <span>All time</span>
+    </div>
+    @if (genres().length) {
+      <app-bar-list [data]="genres()" />
+    } @else {
+      <span class="skeleton"></span>
+    }
+  </article>
+
+  <article class="card">
+    <div class="card-head">
+      <h2>Most watched</h2>
+      <a routerLink="/titles" class="link">See all</a>
+    </div>
+    <ol class="top">
+      @for (t of top()?.data; track t.id; let i = $index) {
+        <li>
+          <span class="rank">{{ i + 1 }}</span>
+          <span class="top-title">
+            <strong>{{ t.title }}</strong>
+            <small>{{ t.genre }}, {{ t.year }}</small>
+          </span>
+          <span class="top-views">{{ formatCompact(t.views) }}</span>
+        </li>
+      } @empty {
+        <li class="skeleton"></li>
+      }
+    </ol>
+  </article>
+</section>

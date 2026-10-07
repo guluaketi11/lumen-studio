@@ -1,0 +1,89 @@
+<div class="backdrop" (click)="close.emit()"></div>
+<aside class="drawer" role="dialog" aria-modal="true" [attr.aria-label]="isNew() ? 'New title' : 'Edit ' + title()?.title">
+  <header class="drawer-head">
+    <div>
+      <h2>{{ isNew() ? 'New title' : 'Edit title' }}</h2>
+      @if (title(); as t) {
+        <p>{{ t.slug }} · {{ t.views.toLocaleString('en') }} views</p>
+      }
+    </div>
+    <button class="icon-btn" type="button" (click)="close.emit()" aria-label="Close">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" /></svg>
+    </button>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="body">
+      <label class="control">
+        <span>Title</span>
+        <input class="field" formControlName="title" [class.invalid]="error('title')" autocomplete="off" />
+        @if (error('title'); as msg) { <small class="msg">{{ msg }}</small> }
+      </label>
+
+      <div class="row">
+        <label class="control">
+          <span>Genre</span>
+          <select class="field" formControlName="genre" [class.invalid]="error('genre')">
+            <option value="" disabled>Choose a genre</option>
+            @for (g of genres; track g) { <option [value]="g">{{ g }}</option> }
+          </select>
+          @if (error('genre'); as msg) { <small class="msg">{{ msg }}</small> }
+        </label>
+        <label class="control">
+          <span>Year</span>
+          <input class="field" type="number" formControlName="year" [class.invalid]="error('year')" />
+          @if (error('year'); as msg) { <small class="msg">{{ msg }}</small> }
+        </label>
+        <label class="control">
+          <span>Length (min)</span>
+          <input class="field" type="number" formControlName="durationMinutes" [class.invalid]="error('durationMinutes')" />
+          @if (error('durationMinutes'); as msg) { <small class="msg">{{ msg }}</small> }
+        </label>
+      </div>
+
+      <label class="control">
+        <span>Description</span>
+        <textarea class="field" rows="4" formControlName="description" [class.invalid]="error('description')"></textarea>
+        @if (error('description'); as msg) { <small class="msg">{{ msg }}</small> }
+      </label>
+
+      <label class="control">
+        <span>Stream URL</span>
+        <input class="field mono" formControlName="streamUrl" placeholder="https://…/playlist.m3u8" [class.invalid]="error('streamUrl')" />
+        @if (error('streamUrl'); as msg) { <small class="msg">{{ msg }}</small> }
+      </label>
+
+      <fieldset class="control">
+        <legend>Status</legend>
+        <div class="segmented">
+          @for (s of statuses; track s.value) {
+            <label [class.is-on]="form.controls.status.value === s.value">
+              <input type="radio" formControlName="status" [value]="s.value" />
+              <span [class]="'status-dot ' + s.value"></span>
+              {{ s.label }}
+            </label>
+          }
+        </div>
+      </fieldset>
+    </div>
+
+    <footer class="drawer-foot">
+      @if (confirming()) {
+        <div class="confirm" role="alert">
+          <span>Delete “{{ title()?.title }}”? This can't be undone.</span>
+          <button class="btn" type="button" (click)="confirming.set(false)">Keep it</button>
+          <button class="btn btn-danger-solid" type="button" (click)="remove.emit(title()!)" [disabled]="saving()">Delete</button>
+        </div>
+      } @else {
+        @if (!isNew()) {
+          <button class="btn btn-danger" type="button" (click)="confirming.set(true)">Delete</button>
+        }
+        <span class="spacer"></span>
+        <button class="btn" type="button" (click)="close.emit()">Cancel</button>
+        <button class="btn btn-primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : isNew() ? 'Create title' : 'Save changes' }}
+        </button>
+      }
+    </footer>
+  </form>
+</aside>

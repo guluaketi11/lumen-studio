@@ -1,0 +1,133 @@
+<header class="page-head">
+  <div>
+    <h1>Titles</h1>
+    <p>Search, filter and edit everything in the catalog.</p>
+  </div>
+  <button class="btn btn-primary" type="button" (click)="editing.set(null)">
+    <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" /></svg>
+    New title
+  </button>
+</header>
+
+<div class="toolbar">
+  <label class="search">
+    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" /><path d="M13.2 13.2L17 17" /></svg>
+    <span class="sr-only">Search titles</span>
+    <input
+      class="field"
+      type="search"
+      placeholder="Search titles and descriptions"
+      [value]="query().search"
+      (input)="update({ search: $any($event.target).value })"
+    />
+  </label>
+
+  <label>
+    <span class="sr-only">Genre</span>
+    <select class="field" [value]="query().genre" (change)="update({ genre: $any($event.target).value })">
+      <option value="">All genres</option>
+      @for (g of genres; track g) { <option [value]="g">{{ g }}</option> }
+    </select>
+  </label>
+
+  <div class="segmented" role="group" aria-label="Status">
+    <button type="button" [class.is-on]="!query().status" (click)="setStatus('')">All</button>
+    @for (s of statuses; track s.value) {
+      <button type="button" [class.is-on]="query().status === s.value" (click)="setStatus(s.value)">
+        <span [class]="'status-dot ' + s.value"></span>
+        {{ s.label }}
+      </button>
+    }
+  </div>
+</div>
+
+<div class="card table-card" [class.is-loading]="loading()">
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th [attr.aria-sort]="sortState('title')">
+            <button type="button" (click)="sortBy('title')">Title <span class="arrow"></span></button>
+          </th>
+          <th>Genre</th>
+          <th [attr.aria-sort]="sortState('year')">
+            <button type="button" (click)="sortBy('year')">Year <span class="arrow"></span></button>
+          </th>
+          <th class="num">Length</th>
+          <th>Status</th>
+          <th class="num" [attr.aria-sort]="sortState('views')">
+            <button type="button" (click)="sortBy('views')">Views <span class="arrow"></span></button>
+          </th>
+          <th class="num" [attr.aria-sort]="sortState('updatedAt')">
+            <button type="button" (click)="sortBy('updatedAt')">Updated <span class="arrow"></span></button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of page()?.data; track t.id) {
+          <tr tabindex="0" (click)="editing.set(t)" (keydown.enter)="editing.set(t)">
+            <td>
+              <strong class="t-title">{{ t.title }}</strong>
+              <span class="t-slug">{{ t.slug }}</span>
+            </td>
+            <td>{{ t.genre }}</td>
+            <td class="tabular">{{ t.year }}</td>
+            <td class="num">{{ t.durationMinutes }} min</td>
+            <td>
+              <span class="status"><span [class]="'status-dot ' + t.status"></span>{{ statusLabel(t.status) }}</span>
+            </td>
+            <td class="num strong">{{ formatNumber(t.views) }}</td>
+            <td class="num muted">{{ formatDate(t.updatedAt) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (failed()) {
+      <div class="empty">
+        <strong>Couldn't load titles</strong>
+        <p>The catalog didn't respond. Check your connection and try again.</p>
+        <button class="btn" type="button" (click)="goTo(query().page)">Try again</button>
+      </div>
+    } @else if (page() && !page()!.data.length) {
+      <div class="empty">
+        <strong>No titles match these filters</strong>
+        <p>Try a different search, or clear the filters to see the whole catalog.</p>
+        <button class="btn" type="button" (click)="clearFilters()">Clear filters</button>
+      </div>
+    }
+  </div>
+
+  @if (page(); as p) {
+    @if (p.meta.total) {
+      <footer class="pager">
+        <span class="muted">{{ range() }}</span>
+        <div class="pager-buttons">
+          <button class="btn" type="button" [disabled]="p.meta.page === 1" (click)="goTo(p.meta.page - 1)">Previous</button>
+          @for (n of pages(p); track n) {
+            <button
+              class="btn page-btn"
+              type="button"
+              [class.is-on]="n === p.meta.page"
+              [attr.aria-current]="n === p.meta.page ? 'page' : null"
+              (click)="goTo(n)"
+            >
+              {{ n }}
+            </button>
+          }
+          <button class="btn" type="button" [disabled]="p.meta.page === p.meta.pages" (click)="goTo(p.meta.page + 1)">Next</button>
+        </div>
+      </footer>
+    }
+  }
+</div>
+
+@if (editing() !== undefined) {
+  <app-title-form
+    [title]="editing()!"
+    [saving]="saving()"
+    (save)="onSave($event)"
+    (remove)="onRemove($event)"
+    (close)="editing.set(undefined)"
+  />
+}
